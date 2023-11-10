@@ -4,13 +4,20 @@ from selenium.webdriver.common.by import By
 
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 
 import time
 import os
 
+HEADLESS=False
+
+# Set Driver options
+if HEADLESS:
+    options = Options()
+    options.add_argument("--headless=new")
 
 # init driver
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(options=options)
 
 # Login -------
 driver.get("https://reserve.altaparking.com/login")
@@ -66,6 +73,4 @@ btn = driver.find_element(
     By.XPATH, '//*[@id="root"]/div/div/div/div[3]/div[2]/div/div/div[1]')
 btn.click()
 
-
-while True:
-    pass
+print(driver.title)
