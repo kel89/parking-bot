@@ -1,49 +1,55 @@
-FROM public.ecr.aws/lambda/python:3.11
+FROM ubuntu:18.04
 
-# WebDriver Stuff --------------------------------------
-# We need wget to set up the PPA and xvfb to have a virtual screen and unzip to install the Chromedriver
-# RUN apt install -y wget xvfb unzip
+SHELL ["/bin/bash", "-c"]
 
-# # Set up the Chrome PPA
-# RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-# RUN echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
+RUN apt update && apt-get install -y software-properties-common
+RUN apt update && add-apt-repository ppa:deadsnakes/ppa
+RUN apt update && apt-get install -y \
+    make \
+    curl \
+    python3.7 \
+    python3.7-distutils \
+    g++ \
+    cmake \
+    unzip \
+    libcurl4-openssl-dev \
+    git
+RUN apt-get update && apt-get install -y \
+    fonts-liberation libappindicator3-1 libasound2 libatk-bridge2.0-0 \
+    libnspr4 libnss3 lsb-release xdg-utils libxss1 libdbus-glib-1-2 \
+    autoconf cmake curl libtool unzip wget \
+    xvfb
 
-# # Update the package list and install chrome
-# RUN apt update -y
-# RUN apt install -y google-chrome-stable
 
-# # Set up Chromedriver Environment variables
-# ENV CHROMEDRIVER_VERSION 2.19
-# ENV CHROMEDRIVER_DIR /chromedriver
-# RUN mkdir $CHROMEDRIVER_DIR
+# install chromedriver and google-chrome
 
-# # Download and install Chromedriver
-# RUN wget -q --continue -P $CHROMEDRIVER_DIR "http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
-# RUN unzip $CHROMEDRIVER_DIR/chromedriver* -d $CHROMEDRIVER_DIR
+RUN apt update && apt-get install -y chromium-browser chromium-chromedriver
 
-# # Put Chromedriver into the PATH
-# ENV PATH $CHROMEDRIVER_DIR:$PATH
-# ------------------------------------------------------------
 
-# Web Driver 2 -----------------------------------------------------------------
-# Download chrome driver
-RUN curl -SL https://chromedriver.storage.googleapis.com/2.37/chromedriver_linux64.zip > chromedriver.zip
-RUN unzip chromedriver.zip
-RUN rm chromedriver.zip
+# install amazon RIE for lambda testing
 
-# Download Chrome Binary
-RUN curl -SL https://github.com/adieuadieu/serverless-chrome/releases/download/v1.0.0-41/stable-headless-chromium-amazonlinux-2017-03.zip > headless-chromium.zip
-RUN unzip headless-chromium.zip
-RUN rm headless-chromium.zip
+RUN curl -L https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/latest/download/aws-lambda-rie -o aws-lambda-rie-x86_64 && \
+    mv aws-lambda-rie-x86_64 /usr/local/bin/aws-lambda-rie && \
+    chmod +x /usr/local/bin/aws-lambda-rie
 
-# Compress Driver and Binary
-RUN zip -r chromedriver.zip chromedriver headless-chromium
 
-#------------------------------------------------------------------------------
+# install pip and set up virtualenv
 
-COPY requirements.txt ${LAMBDA_TASK_ROOT}
-RUN pip install -r requirements.txt
+RUN curl -o /tmp/get_pip.py https://bootstrap.pypa.io/get-pip.py && \
+    python3.7 /tmp/get_pip.py && \
+    python3.7 -m pip install virtualenv
 
-COPY lambda_function.py ${LAMBDA_TASK_ROOT}
 
-CMD [ "lambda_function.lambda_handler" ]
+# generate working directory locations
+
+RUN mkdir -p /code
+WORKDIR /code
+ENV PATH="${PATH}:/code:/usr/lib"
+
+COPY requirements.txt /code/requirements.txt
+COPY entry_script.sh /code/entry_script.sh
+# COPY lib/ /code/lib/
+
+RUN make install
+
+ENTRYPOINT [ "sh", "/code/entry_script.sh" ]
