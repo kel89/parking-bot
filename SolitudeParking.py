@@ -175,6 +175,9 @@ class SolitudeParking:
             By.XPATH, '//button[text()="Confirm"]')
         confirm_btn.click()
 
+    def output(self):
+        print(self.driver.current_url)
+
 
 if __name__ == "__main__":
     sp = SolitudeParking()
@@ -184,7 +187,8 @@ if __name__ == "__main__":
     sp.go_to_selection_calendar()
     sp.navigate_to_date(dt.datetime(2024, 2, 19))
     sp.select_parking_option()
-    sp.reserve()
+    
+    # sp.reserve()
 
     # just keep page open for debuggin
     while True:
