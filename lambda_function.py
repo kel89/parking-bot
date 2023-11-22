@@ -33,6 +33,8 @@ def lambda_handler(event, context):
         chrome_options=options,
         executable_path=driver_path,
     )
+    
+    
     print("Driver init")
     driver.get("http://www.google.com")
     print("Got page")
@@ -42,3 +44,5 @@ def lambda_handler(event, context):
     return { 
         'current_url' : driver.current_url
     }
+
+lambda_handler()

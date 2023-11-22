@@ -6,6 +6,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 
+from tempfile import mkdtemp
 import time
 import os
 import datetime as dt
@@ -14,8 +15,10 @@ LOGIN_URL = "https://reservenski.parksolitude.com/login"
 
 
 class SolitudeParking:
-    def __init__(self, headless=False):
-        self.headless = headless
+    def __init__(self, driver):
+        self.driver = driver
+        self.driver.get(LOGIN_URL)
+
 
     def start_session(self):
         """Creates the selenium session
@@ -39,8 +42,10 @@ class SolitudeParking:
             By.XPATH, '//*[@id="root"]/div/div/div/div[1]/div[2]/div/div/form/div[3]/button')
 
         # Fill
-        username.send_keys(os.environ['solitude_username'])
-        password.send_keys(os.environ['solitude_password'])
+        # username.send_keys(os.environ['solitude_username'])
+        # password.send_keys(os.environ['solitude_password'])
+        username.send_keys("kel89@cornell.edu")
+        password.send_keys("t3$tnew")
 
         # Submit
         submit_btn.click()
@@ -180,16 +185,31 @@ class SolitudeParking:
 
 
 if __name__ == "__main__":
-    sp = SolitudeParking()
-    sp.start_session()
-    sp.login()
-    sp.activate_code()
-    sp.go_to_selection_calendar()
-    sp.navigate_to_date(dt.datetime(2024, 2, 19))
-    sp.select_parking_option()
-    
-    # sp.reserve()
+    options = webdriver.ChromeOptions()
 
-    # just keep page open for debuggin
-    while True:
-        pass
+    options.add_argument("--headless=new")
+    options.add_argument('--no-sandbox')
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1280x1696")
+    # options.add_argument("--single-process")
+    # options.add_argument("--disable-dev-shm-usage")
+    # options.add_argument("--disable-dev-tools")
+    # options.add_argument("--no-zygote")
+    # options.add_argument(f"--user-data-dir={mkdtemp()}")
+    # options.add_argument(f"--data-path={mkdtemp()}")
+    # options.add_argument(f"--disk-cache-dir={mkdtemp()}")
+    # options.add_argument("--remote-debugging-port=9222")
+    chrome = webdriver.Chrome(options=options)
+    sp = SolitudeParking(chrome)
+    # sp.start_session()
+    sp.login()
+    # sp.activate_code()
+    # sp.go_to_selection_calendar()
+    # sp.navigate_to_date(dt.datetime(2024, 2, 19))
+    # sp.select_parking_option()
+    
+#     # sp.reserve()
+
+#     # just keep page open for debuggin
+#     while True:
+#         pass
