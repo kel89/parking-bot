@@ -183,6 +183,14 @@ class SolitudeParking:
     def output(self):
         print(self.driver.current_url)
 
+    def make_reservation(self, target_date):
+        self.login()
+        self.activate_code()
+        self.go_to_selection_calendar()
+        self.navigate_to_date(target_date)
+        self.select_parking_option()
+        self.reserve()
+
 
 if __name__ == "__main__":
     options = webdriver.ChromeOptions()
