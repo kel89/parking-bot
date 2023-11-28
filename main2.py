@@ -11,8 +11,7 @@ from SolitudeParking import SolitudeParking
 
 def lambda_handler(event, context):
     # Parse the triggering message
-    # message = json.loads(event['Records'][0]['Sns']['Message'])
-    message = event['Records'][0]['Sns']['Message']
+    message = json.loads(event['Records'][0]['Sns']['Message'])
 
     # Extract the key info
     resort = message['resort']
