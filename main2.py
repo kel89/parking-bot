@@ -16,7 +16,7 @@ def lambda_handler(event, context):
     # Extract the key info
     resort = message['resort']
     reserve_target = message['reserveTarget']
-    reserve_target_date = reserve_target.strptime("%Y-%m-%d", reserve_target)
+    reserve_target_date = dt.datetime.strptime( reserve_target, "%Y-%m-%d")
     user_id = message['user']
     
     # Get the passwords
@@ -43,8 +43,17 @@ def lambda_handler(event, context):
 
     chrome = webdriver.Chrome(options=options, service=service)
 
+
+    # For testing locally, not in container, use this webdriver setup --------
+    # options = webdriver.ChromeOptions()
+    # options.add_argument("--window-size=1280,1696")
+    # chrome = webdriver.Chrome(options=options)
+    # ---------------------------------------------------------------------
+
+
+
     if resort == "SOLITUDE":
-        sp = SolitudeParking(chrome)
+        sp = SolitudeParking(chrome, creds)
         sp.make_reservation(reserve_target_date)
     elif resort == "BRIGHTON":
         pass
@@ -57,15 +66,16 @@ test_data = {
     "Records": [
         {
             'Sns': {
-                'Message': {
+                'Message': """{
                     "resort": "SOLITUDE",
-                    "reserveTarget": "2023-11-29",
+                    "reserveTarget": "2023-12-30",
                     "user": "e39fdf08-ee98-4c66-864a-90a6cf3543b1"
 
-                }
+                }"""
             }
         }
     ]
 }
+
 if __name__ == "__main__":
     lambda_handler(test_data, None)

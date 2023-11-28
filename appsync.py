@@ -16,7 +16,6 @@ def get_credentials(user_id, resort):
         }
     }
     """ % (user_id, resort)
-    print(graphql_query)
     # return
     # AWS AppSync requires a specific header for authorization
     headers = {
@@ -31,7 +30,6 @@ def get_credentials(user_id, resort):
     if response.status_code == 200:
         result = response.json()
         # Process the result as needed
-        print("GraphQL Query Result:", result)
     else:
         # hope we don't get here because I'm not going to handle it
         print("GraphQL Query Failed. Status Code:", response.status_code)

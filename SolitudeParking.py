@@ -15,9 +15,11 @@ LOGIN_URL = "https://reservenski.parksolitude.com/login"
 
 
 class SolitudeParking:
-    def __init__(self, driver):
+    def __init__(self, driver, credentials):
         self.driver = driver
         self.driver.get(LOGIN_URL)
+        self.username = credentials['username']
+        self.password = credentials['password']
 
 
     def start_session(self):
@@ -44,8 +46,8 @@ class SolitudeParking:
         # Fill
         # username.send_keys(os.environ['solitude_username'])
         # password.send_keys(os.environ['solitude_password'])
-        username.send_keys("kel89@cornell.edu")
-        password.send_keys("t3$tnew")
+        username.send_keys(self.username)
+        password.send_keys(self.password)
 
         # Submit
         submit_btn.click()
@@ -82,7 +84,6 @@ class SolitudeParking:
     def go_to_selection_calendar(self):
         """Goes to the calendar selection page, if not already there
         """
-        print("Current url", self.driver.current_url)
         if (self.driver.current_url != "https://reservenski.parksolitude.com/select-parking"):
             self.driver.get(
                 "https://reservenski.parksolitude.com/select-parking")
@@ -179,6 +180,7 @@ class SolitudeParking:
         confirm_btn = self.driver.find_element(
             By.XPATH, '//button[text()="Confirm"]')
         confirm_btn.click()
+        print("Reservation complete")
 
     def output(self):
         print(self.driver.current_url)
