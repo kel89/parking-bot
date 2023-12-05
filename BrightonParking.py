@@ -21,7 +21,6 @@ class BrightonParking:
         self.username = credentials['username']
         self.password = credentials['password']
 
-
     def start_session(self):
         """Creates the selenium session
         """
@@ -61,7 +60,8 @@ class BrightonParking:
         this will give us the $0 option in booking
         """
         # Go to codes
-        self.driver.get("https://reservenski.parkbrightonresort.com/parking-codes")
+        self.driver.get(
+            "https://reservenski.parkbrightonresort.com/parking-codes")
 
         # Wait for button
         btn_xpath = '//button[text()="Reserve Parking"]'
@@ -200,10 +200,7 @@ if __name__ == "__main__":
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1280x1696")
     chrome = webdriver.Chrome(options=options)
-    sp = BrightonParking(chrome, credentials={
-        'username': "amycai12@yahoo.com",
-        'password': "tiphes-mozki5-rArzun"
-    })
+    sp = BrightonParking(chrome)
     sp.start_session()
     sp.login()
     sp.activate_code()
@@ -213,4 +210,3 @@ if __name__ == "__main__":
     # sp.reserve()
     # Set a breakpoint here to keep page open
     print("Done")
-    
