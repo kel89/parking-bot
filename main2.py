@@ -6,6 +6,7 @@ from tempfile import mkdtemp
 from selenium.webdriver.common.by import By
 import datetime as dt
 
+from BrightonParking import BrightonParking
 from SolitudeParking import SolitudeParking
 
 
@@ -56,7 +57,8 @@ def lambda_handler(event, context):
         sp = SolitudeParking(chrome, creds)
         sp.make_reservation(reserve_target_date)
     elif resort == "BRIGHTON":
-        pass
+        bp = BrightonParking(chrome, creds)
+        bp.make_reservation(reserve_target_date)
     elif resort == "ALTA":
         pass
     else:
