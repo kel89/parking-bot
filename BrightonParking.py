@@ -21,7 +21,6 @@ class BrightonParking:
         self.username = credentials['username']
         self.password = credentials['password']
 
-
     def start_session(self):
         """Creates the selenium session
         """
@@ -61,7 +60,8 @@ class BrightonParking:
         this will give us the $0 option in booking
         """
         # Go to codes
-        self.driver.get("https://reservenski.parkbrightonresort.com/parking-codes")
+        self.driver.get(
+            "https://reservenski.parkbrightonresort.com/parking-codes")
 
         # Wait for button
         btn_xpath = '//button[text()="Reserve Parking"]'
@@ -213,4 +213,3 @@ if __name__ == "__main__":
     # sp.reserve()
     # Set a breakpoint here to keep page open
     print("Done")
-    
