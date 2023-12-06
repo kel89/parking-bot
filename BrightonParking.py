@@ -11,6 +11,10 @@ import time
 import os
 import datetime as dt
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 LOGIN_URL = "https://reservenski.parkbrightonresort.com/login"
 
 
@@ -201,14 +205,14 @@ if __name__ == "__main__":
     options.add_argument("--window-size=1280x1696")
     chrome = webdriver.Chrome(options=options)
     sp = BrightonParking(chrome, credentials={
-        'username': "amycai12@yahoo.com",
-        'password': "tiphes-mozki5-rArzun"
+        "username": os.getenv("USERNAME"),
+        "password": os.getenv("PASSWORD")
     })
     sp.start_session()
     sp.login()
     sp.activate_code()
     sp.go_to_selection_calendar()
-    sp.navigate_to_date(dt.datetime(2024, 1, 11))
+    sp.navigate_to_date(dt.datetime(2023, 12, 11))
     sp.select_parking_option()
     # sp.reserve()
     # Set a breakpoint here to keep page open

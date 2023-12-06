@@ -108,63 +108,69 @@ def getAvailability(startDate: datetime.date, endDate: datetime.date) -> list[Da
 
     # Internal function to fetch availability for a given date range, used since the API can only fetch 1 calendar year at a time.
     def _fetch(startDay: int, endDay: int, year: int) -> list[DateAvailability]:
-        url = 'https://platform.honkmobile.com/graphql?honkGUID=kznloxi05aiqtplsfw2kw'
-        headers = {
-            'Accept': '*/*',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Connection': 'keep-alive',
-            'Origin': 'https://reservenski.parkbrightonresort.com',
-            'Referer': 'https://reservenski.parkbrightonresort.com/',
-            'Sec-Fetch-Dest': 'empty',
-            'Sec-Fetch-Mode': 'cors',
-            'Sec-Fetch-Site': 'cross-site',
-            'TE': 'trailers',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/119.0',
-            'content-type': 'application/json',
-            'x-authentication': '02eed7c6b23447188e5ab6bfd8831c9a'
-        }
+        try:
+            url = 'https://platform.honkmobile.com/graphql?honkGUID=kznloxi05aiqtplsfw2kw'
+            headers = {
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Connection': 'keep-alive',
+                'Origin': 'https://reservenski.parkbrightonresort.com',
+                'Referer': 'https://reservenski.parkbrightonresort.com/',
+                'Sec-Fetch-Dest': 'empty',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'cross-site',
+                'TE': 'trailers',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/119.0',
+                'content-type': 'application/json',
+                'x-authentication': '02eed7c6b23447188e5ab6bfd8831c9a'
+            }
 
-        requestData = {
-            'operationName': 'DetailedParkingAvailability',
-            'variables': {
-                'id': 'rrIb',
-                'startDay': startDay,
-                'endDay': endDay,
-                'year': year
-            },
-            'query': 'query DetailedParkingAvailability($id: ID!, $startDay: Int!, $endDay: Int!, $year: Int!) {\n  detailedParkingAvailability(\n    id: $id\n    startDay: $startDay\n    endDay: $endDay\n    year: $year\n  )\n}\n'
-        }
+            requestData = {
+                'operationName': 'DetailedParkingAvailability',
+                'variables': {
+                    'id': 'rrIb',
+                    'startDay': startDay,
+                    'endDay': endDay,
+                    'year': year
+                },
+                'query': 'query DetailedParkingAvailability($id: ID!, $startDay: Int!, $endDay: Int!, $year: Int!) {\n  detailedParkingAvailability(\n    id: $id\n    startDay: $startDay\n    endDay: $endDay\n    year: $year\n  )\n}\n'
+            }
 
-        response = requests.post(url, headers=headers, json=requestData)
-        response.raise_for_status()
-        data = response.json()
-        rawAvailableDates = data["data"]["detailedParkingAvailability"]
-        # convert rawAvailableDates to a DateAvailability list; rawAvailableDates is a dict where each key is a date string
-        availableDates = []
-        for rawDate, rawAvailability in rawAvailableDates.items():
-            seasonPassString = "jZ3W0cN"
+            response = requests.post(url, headers=headers, json=requestData)
+            response.raise_for_status()
+            data = response.json()
+            rawAvailableDates = data["data"]["detailedParkingAvailability"]
+            # convert rawAvailableDates to a DateAvailability list; rawAvailableDates is a dict where each key is a date string
+            availableDates = []
+            for rawDate, rawAvailability in rawAvailableDates.items():
+                seasonPassString = "jZ3W0cN"
 
-            parsedDate = datetime.datetime.strptime(
-                rawDate, "%Y-%m-%dT%H:%M:%S%z").date()
+                parsedDate = datetime.datetime.strptime(
+                    rawDate, "%Y-%m-%dT%H:%M:%S%z").date()
 
-            # Here's something fun: it seems like when the API doesn't show an availibility for a certain type, it falls back to the "general" type.
-            # This might imply that at some point, Brighton decides that Season Pass availability is in the same pool as general availability?
-            # AKA for spots released early, it's split into groups of season pass and general, but for spots released later, it's just one big pool?
-            if seasonPassString not in rawAvailability:
-                parkingTypeKey = "general"
-            else:
-                parkingTypeKey = seasonPassString
+                # Here's something fun: it seems like when the API doesn't show an availibility for a certain type, it falls back to the "general" type.
+                # This might imply that at some point, Brighton decides that Season Pass availability is in the same pool as general availability?
+                # AKA for spots released early, it's split into groups of season pass and general, but for spots released later, it's just one big pool?
+                if seasonPassString not in rawAvailability:
+                    parkingTypeKey = "general"
+                else:
+                    parkingTypeKey = seasonPassString
 
-            seasonPass = parseSpaceStatus(
-                rawAvailability.get(parkingTypeKey))
-            availableDates.append(DateAvailability(
-                date=parsedDate,
-                seasonPassStatus=seasonPass)
-            )
-        return availableDates
+                seasonPass = parseSpaceStatus(
+                    rawAvailability.get(parkingTypeKey))
+                availableDates.append(DateAvailability(
+                    date=parsedDate,
+                    seasonPassStatus=seasonPass)
+                )
+            return availableDates
+        except requests.exceptions.RequestException as error:
+            print("Error fetching availability")
+            print(error)
+            return []
 
     # Chunk the date range into a dict of year -> startDay, endDay
+
     def daterange(startDate, emdDate):
         for n in range(int((emdDate - startDate).days)):
             yield startDate + datetime.timedelta(n)

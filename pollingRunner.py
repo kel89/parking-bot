@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from selenium import webdriver
 
@@ -9,15 +10,16 @@ from BrightonParking import BrightonParking
 import schedule
 import time
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 user = {
-    "username": "edwardhcai@gmail.com",
-    "password": "8cb!9Qh.tk"
+    "username": os.getenv("USERNAME"),
+    "password": os.getenv("PASSWORD")
 }
 
-# requestedDates = [datetime.date(2024, 1, 18), datetime.date(2023, 12, 9)]
 requestedDates = [datetime.date(2023, 12, 8), datetime.date(2023, 12, 10)]
-# requestedDates = [datetime.date(2023, 12, 9)]
-
 
 # # Only set this to true at the beginning and if we try to make a reservation to
 # avoid spamming the API
@@ -68,9 +70,9 @@ def checkForReservations():
 
 if __name__ == "__main__":
 
-    print("Attempting to reserve dates: " + str(requestedDates))
+    print("Script running to reserve dates: " + str(requestedDates))
 
-    schedule.every(30).seconds.do(checkForReservations)
+    schedule.every(10).seconds.do(checkForReservations)
 
     # Loop until all dates are reserved
     while True:
