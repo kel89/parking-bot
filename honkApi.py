@@ -147,8 +147,17 @@ def getAvailability(startDate: datetime.date, endDate: datetime.date) -> list[Da
 
             parsedDate = datetime.datetime.strptime(
                 rawDate, "%Y-%m-%dT%H:%M:%S%z").date()
+
+            # Here's something fun: it seems like when the API doesn't show an availibility for a certain type, it falls back to the "general" type.
+            # This might imply that at some point, Brighton decides that Season Pass availability is in the same pool as general availability?
+            # AKA for spots released early, it's split into groups of season pass and general, but for spots released later, it's just one big pool?
+            if seasonPassString not in rawAvailability:
+                parkingTypeKey = "general"
+            else:
+                parkingTypeKey = seasonPassString
+
             seasonPass = parseSpaceStatus(
-                rawAvailability.get(seasonPassString))
+                rawAvailability.get(parkingTypeKey))
             availableDates.append(DateAvailability(
                 date=parsedDate,
                 seasonPassStatus=seasonPass)
