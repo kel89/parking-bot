@@ -52,12 +52,19 @@ def printNewOpenings(previousAvailabilities: list[DateAvailability], currentAvai
             previousAvailability = previousAvailabilitiesMap[availability.date]
             if (
                 availability.seasonPassStatus.totalSpaces == previousAvailability.seasonPassStatus.totalSpaces
-                and availability.seasonPassStatus.occupiedSpaces < previousAvailability.seasonPassStatus.occupiedSpaces
+                and availability.seasonPassStatus.occupiedSpaces != previousAvailability.seasonPassStatus.occupiedSpaces
             ):
                 print(
-                    f"New spots found at {resortName} for date: {str(availability.date)}")
-                print("Previous availability: " + str(previousAvailability))
-                print("New availability: " + str(availability))
+                    f"Changes found at {resortName} for date: {str(availability.date)}")
+                print("\tPrevious availability: " +
+                      str(previousAvailability.seasonPassStatus))
+                print("\tNew availability: " +
+                      str(availability.seasonPassStatus))
+
+                if (availability.seasonPassStatus.occupiedSpaces < previousAvailability.seasonPassStatus.occupiedSpaces):
+                    print("~~~~~~~~And it was an increase!~~~~~~~~~~~")
+
+                print("")
 
 
 brightonPrev = []
@@ -96,6 +103,9 @@ if __name__ == "__main__":
 
     schedule.every(30).seconds.do(checkBrighton)
     schedule.every(30).seconds.do(checkSolitude)
+
+    checkBrighton()
+    checkSolitude()
 
     # Loop until all dates are reserved
     while True:
