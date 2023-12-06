@@ -4,7 +4,7 @@ import os
 from selenium import webdriver
 
 
-from honkApi import getCurrentReservations, getAvailableDates
+from honkApi import HonkApiResortClients
 
 from BrightonParking import BrightonParking
 import schedule
@@ -13,11 +13,6 @@ import time
 from dotenv import load_dotenv
 
 load_dotenv()
-
-user = {
-    "username": os.getenv("USERNAME"),
-    "password": os.getenv("PASSWORD")
-}
 
 requestedDates = [datetime.date(2023, 12, 8), datetime.date(2023, 12, 10)]
 
@@ -35,13 +30,19 @@ options.add_argument("--disable-gpu")
 options.add_argument("--window-size=1280x1696")
 chrome = webdriver.Chrome(options=options)
 
+apiClient = HonkApiResortClients.BRIGHTON.value
+apiClient.addCredentials({
+    "username": os.getenv("USERNAME"),
+    "password": os.getenv("PASSWORD")
+})
+
 
 def checkForReservations():
     global shouldUpdateCurrentReservations
     global reservedDates
 
     if shouldUpdateCurrentReservations:
-        reservedDates = getCurrentReservations(creds=user)
+        reservedDates = apiClient.getCurrentReservations()
         print("Updated current reservations", reservedDates)
         shouldUpdateCurrentReservations = False
 
@@ -49,7 +50,7 @@ def checkForReservations():
     datesToCheck = [
         date for date in requestedDates if date not in reservedDates]
 
-    availableDates = getAvailableDates(datesToCheck)
+    availableDates = apiClient.getAvailableDates(datesToCheck)
 
     # Some printing to show that the script is running
     if (len(availableDates) == 0):
@@ -58,7 +59,7 @@ def checkForReservations():
 
     for date in availableDates:
         print("Attempting to reserve date: " + str(date))
-        bp = BrightonParking(driver=chrome, credentials=user)
+        bp = BrightonParking(driver=chrome, credentials=apiClient.creds)
         try:
             bp.make_reservation(datetime.datetime(
                 date.year, date.month, date.day))
@@ -69,7 +70,6 @@ def checkForReservations():
 
 
 if __name__ == "__main__":
-
     print("Script running to reserve dates: " + str(requestedDates))
 
     schedule.every(10).seconds.do(checkForReservations)
