@@ -135,7 +135,7 @@ class BrightonParking:
             date (datetime): date we want to select
         """
         # Get the matching string
-        date_string = date.strftime("%A, %B %d")
+        date_string = f'{date:%A}, {date:%B} {date.day}'
 
         # Find the date button
         btn = self.driver.find_element(
