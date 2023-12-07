@@ -51,9 +51,11 @@ def printNewOpenings(previousAvailabilities: list[DateAvailability], currentAvai
         if availability.date in previousAvailabilitiesMap:
             previousAvailability = previousAvailabilitiesMap[availability.date]
             if (
-                availability.seasonPassStatus.totalSpaces == previousAvailability.seasonPassStatus.totalSpaces
-                and availability.seasonPassStatus.occupiedSpaces != previousAvailability.seasonPassStatus.occupiedSpaces
+                availability.seasonPassStatus.totalSpaces != previousAvailability.seasonPassStatus.totalSpaces
+                or availability.seasonPassStatus.occupiedSpaces != previousAvailability.seasonPassStatus.occupiedSpaces
             ):
+                print("")
+                print(f"timestamp: {datetime.datetime.now()}")
                 print(
                     f"Changes found at {resortName} for date: {str(availability.date)}")
                 print("\tPrevious availability: " +

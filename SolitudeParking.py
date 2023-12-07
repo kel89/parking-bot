@@ -21,7 +21,6 @@ class SolitudeParking:
         self.username = credentials['username']
         self.password = credentials['password']
 
-
     def start_session(self):
         """Creates the selenium session
         """
@@ -137,7 +136,7 @@ class SolitudeParking:
             date (datetime): date we want to select
         """
         # Get the matching string
-        date_string = date.strftime("%A, %B %d")
+        date_string = f'{date:%A}, {date:%B} {date.day}'
 
         # Find the date button
         btn = self.driver.find_element(
@@ -217,7 +216,7 @@ if __name__ == "__main__":
     # sp.go_to_selection_calendar()
     # sp.navigate_to_date(dt.datetime(2024, 2, 19))
     # sp.select_parking_option()
-    
+
 #     # sp.reserve()
 
 #     # just keep page open for debuggin

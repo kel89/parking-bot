@@ -139,7 +139,7 @@ class BrightonParking:
             date (datetime): date we want to select
         """
         # Get the matching string
-        date_string = date.strftime("%A, %B %d")
+        date_string = f'{date:%A}, {date:%B} {date.day}'
 
         # Find the date button
         btn = self.driver.find_element(
@@ -212,7 +212,7 @@ if __name__ == "__main__":
     sp.login()
     sp.activate_code()
     sp.go_to_selection_calendar()
-    sp.navigate_to_date(dt.datetime(2023, 12, 11))
+    sp.navigate_to_date(dt.datetime(2024, 1, 17))
     sp.select_parking_option()
     # sp.reserve()
     # Set a breakpoint here to keep page open
