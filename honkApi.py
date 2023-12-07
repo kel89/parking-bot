@@ -34,25 +34,12 @@ class HonkApiClient:
         self.creds = creds
 
     # Returns a list of current reservations
-
     def getCurrentReservations(self) -> list[datetime.date]:
 
         try:
             # Make the first fetch request
             response = requests.post(f'https://platform.honkmobile.com/graphql?honkGUID={self.honkGUID}', headers={
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:120.0) Gecko/20100101 Firefox/120.0',
-                'Accept': '*/*',
-                'Accept-Language': 'en-US,en;q=0.5',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Referer': 'https://reservenski.parkbrightonresort.com/',
                 'content-type': 'application/json',
-                'x-authentication': '',
-                'Origin': 'https://reservenski.parkbrightonresort.com',
-                'Connection': 'keep-alive',
-                'Sec-Fetch-Dest': 'empty',
-                'Sec-Fetch-Mode': 'cors',
-                'Sec-Fetch-Site': 'cross-site',
-                'TE': 'trailers'
             }, json={
                 'operationName': 'Login',
                 'variables': {
@@ -71,19 +58,8 @@ class HonkApiClient:
 
             # Make another fetch request using the authString
             reservationsResponse = requests.post(f'https://platform.honkmobile.com/graphql?honkGUID={self.honkGUID}', headers={
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:120.0) Gecko/20100101 Firefox/120.0',
-                'Accept': '*/*',
-                'Accept-Language': 'en-US,en;q=0.5',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Referer': 'https://reservenski.parkbrightonresort.com/',
                 'content-type': 'application/json',
                 'x-authentication': authString,
-                'Origin': 'https://reservenski.parkbrightonresort.com',
-                'Connection': 'keep-alive',
-                'Sec-Fetch-Dest': 'empty',
-                'Sec-Fetch-Mode': 'cors',
-                'Sec-Fetch-Site': 'cross-site',
-                'TE': 'trailers'
             }, json={
                 'operationName': 'ZoneParkingSessions',
                 'variables': {
@@ -128,19 +104,7 @@ class HonkApiClient:
             try:
                 url = f'https://platform.honkmobile.com/graphql?honkGUID={self.honkGUID}'
                 headers = {
-                    'Accept': '*/*',
-                    'Accept-Encoding': 'gzip, deflate, br',
-                    'Accept-Language': 'en-US,en;q=0.5',
-                    'Connection': 'keep-alive',
-                    'Origin': 'https://reservenski.parkbrightonresort.com',
-                    'Referer': 'https://reservenski.parkbrightonresort.com/',
-                    'Sec-Fetch-Dest': 'empty',
-                    'Sec-Fetch-Mode': 'cors',
-                    'Sec-Fetch-Site': 'cross-site',
-                    'TE': 'trailers',
-                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/119.0',
                     'content-type': 'application/json',
-                    'x-authentication': '02eed7c6b23447188e5ab6bfd8831c9a'
                 }
 
                 requestData = {
