@@ -39,6 +39,11 @@ class BrightonParking:
         """Login the user with enviornment variables
         """
         # Get elements
+        # time.sleep(0)
+        WebDriverWait(self.driver, 15).until(EC.presence_of_all_elements_located(
+            (By.ID,
+             'emailAddress')
+        ))
         username = self.driver.find_element(By.ID, "emailAddress")
         password = self.driver.find_element(By.ID, "password")
         submit_btn = self.driver.find_element(
@@ -142,20 +147,23 @@ class BrightonParking:
         date_string = f'{date:%A}, {date:%B} {date.day}'
 
         # Find the date button
-        btn = self.driver.find_element(
+        btns = self.driver.find_elements(
             By.XPATH, '//div[@aria-label="{}"]'.format(date_string))
-        btn.click()
-
-        # Give it a moment to load the options
-        time.sleep(.5)
+        for btn in btns:
+            if btn.is_enabled() and btn.is_displayed():
+                btn.click()
+                break
 
     def select_parking_option(self):
         """Clicks the Season Pass Holder option once the date
         is selected, which redirect to purchasing
         """
-        # Find button
+        # Wait for button to load and click
+        btn_xpath = '//div[text()="Season\'s Pass"]/parent::*/parent::*'
+        WebDriverWait(self.driver, 3).until(EC.presence_of_element_located(
+            (By.XPATH, btn_xpath)))
         btn = self.driver.find_element(
-            By.XPATH, '//div[text()="Season\'s Pass"]/parent::*/parent::*')
+            By.XPATH, btn_xpath)
         btn.click()
 
         # Wait for honk to load
@@ -182,6 +190,8 @@ class BrightonParking:
         confirm_btn = self.driver.find_element(
             By.XPATH, '//button[text()="Confirm"]')
         confirm_btn.click()
+        # Give some time for the reservation to complete
+        time.sleep(3)
         print("Reservation complete")
 
     def output(self):
@@ -193,7 +203,8 @@ class BrightonParking:
         self.go_to_selection_calendar()
         self.navigate_to_date(target_date)
         self.select_parking_option()
-        self.reserve()
+        # self.reserve()
+        print("DONE")
 
 
 if __name__ == "__main__":
@@ -212,7 +223,7 @@ if __name__ == "__main__":
     sp.login()
     sp.activate_code()
     sp.go_to_selection_calendar()
-    sp.navigate_to_date(dt.datetime(2024, 1, 17))
+    sp.navigate_to_date(dt.datetime(2023, 12, 8))
     sp.select_parking_option()
     # sp.reserve()
     # Set a breakpoint here to keep page open

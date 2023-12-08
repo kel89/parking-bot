@@ -14,8 +14,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+requestedDates = [datetime.date(2023, 12, 8)]
 # requestedDates = [datetime.date(2023, 12, 8), datetime.date(2023, 12, 10)]
-requestedDates = [datetime.date(2024, 1, 9)]
+# requestedDates = [datetime.date(2024, 1, 9)]
 
 # # Only set this to true at the beginning and if we try to make a reservation to
 # avoid spamming the API

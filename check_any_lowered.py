@@ -75,9 +75,6 @@ brightonPrev = []
 def checkBrighton():
     global brightonPrev
 
-    # Some printing to show that the script is running
-    print("b", end="", flush=True)
-
     client = HonkApiResortClients.BRIGHTON.value
     currentAvailabilities = getAvailabilities(
         client, datetime.date(2023, 12, 7), datetime.date(2024, 4, 10))
@@ -91,9 +88,6 @@ solitudePrev = []
 def checkSolitude():
     global solitudePrev
 
-    # Some printing to show that the script is running
-    print("s", end="", flush=True)
-
     client = HonkApiResortClients.SOLITUDE.value
     currentAvailabilities = getAvailabilities(
         client, datetime.date(2023, 12, 7), datetime.date(2024, 4, 10))
@@ -102,6 +96,8 @@ def checkSolitude():
 
 
 if __name__ == "__main__":
+
+    print("checking for diffs at brighton and solitude")
 
     schedule.every(30).seconds.do(checkBrighton)
     schedule.every(30).seconds.do(checkSolitude)
