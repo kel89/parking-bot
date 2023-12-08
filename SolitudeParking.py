@@ -157,7 +157,7 @@ class SolitudeParking:
         is selected, which redirect to purchasing
         """
         # Wait for button to load and click
-        btn_xpath = '//div[text()="Season\'s Pass"]/parent::*/parent::*'
+        btn_xpath = '//div[text()="Season Pass Holders"]/parent::*/parent::*'
         WebDriverWait(self.driver, 3).until(EC.presence_of_element_located(
             (By.XPATH, btn_xpath)))
         btn = self.driver.find_element(
