@@ -205,7 +205,6 @@ class BrightonParking:
         self.navigate_to_date(target_date)
         self.select_parking_option()
         self.reserve()
-        print("DONE")
 
 
 if __name__ == "__main__":
