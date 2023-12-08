@@ -39,7 +39,6 @@ class BrightonParking:
         """Login the user with enviornment variables
         """
         # Get elements
-        # time.sleep(0)
         WebDriverWait(self.driver, 15).until(EC.presence_of_all_elements_located(
             (By.ID,
              'emailAddress')
@@ -146,7 +145,9 @@ class BrightonParking:
         # Get the matching string
         date_string = f'{date:%A}, {date:%B} {date.day}'
 
-        # Find the date button
+        # Find the date button. There are hidden calendar elements on the
+        # page (to support the animation of switching months), so some dates
+        # are duplicated. We find the first one that is enabled and click it.
         btns = self.driver.find_elements(
             By.XPATH, '//div[@aria-label="{}"]'.format(date_string))
         for btn in btns:
@@ -203,7 +204,7 @@ class BrightonParking:
         self.go_to_selection_calendar()
         self.navigate_to_date(target_date)
         self.select_parking_option()
-        # self.reserve()
+        self.reserve()
         print("DONE")
 
 
@@ -223,7 +224,7 @@ if __name__ == "__main__":
     sp.login()
     sp.activate_code()
     sp.go_to_selection_calendar()
-    sp.navigate_to_date(dt.datetime(2023, 12, 8))
+    sp.navigate_to_date(dt.datetime(2024, 1, 9))
     sp.select_parking_option()
     # sp.reserve()
     # Set a breakpoint here to keep page open
