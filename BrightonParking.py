@@ -11,6 +11,9 @@ import time
 import os
 import datetime as dt
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 LOGIN_URL = "https://reservenski.parkbrightonresort.com/login"
 
