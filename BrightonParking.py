@@ -11,6 +11,7 @@ import time
 import os
 import datetime as dt
 
+
 LOGIN_URL = "https://reservenski.parkbrightonresort.com/login"
 
 
@@ -35,6 +36,10 @@ class BrightonParking:
         """Login the user with enviornment variables
         """
         # Get elements
+        WebDriverWait(self.driver, 15).until(EC.presence_of_all_elements_located(
+            (By.ID,
+             'emailAddress')
+        ))
         username = self.driver.find_element(By.ID, "emailAddress")
         password = self.driver.find_element(By.ID, "password")
         submit_btn = self.driver.find_element(
@@ -137,21 +142,26 @@ class BrightonParking:
         # Get the matching string
         date_string = f'{date:%A}, {date:%B} {date.day}'
 
-        # Find the date button
-        btn = self.driver.find_element(
+        # Find the date button. There are hidden calendar elements on the
+        # page (to support the animation of switching months), so some dates
+        # are duplicated. We find the first one that is enabled and click it.
+        btns = self.driver.find_elements(
             By.XPATH, '//div[@aria-label="{}"]'.format(date_string))
-        btn.click()
-
-        # Give it a moment to load the options
-        time.sleep(.5)
+        for btn in btns:
+            if btn.is_enabled() and btn.is_displayed():
+                btn.click()
+                break
 
     def select_parking_option(self):
         """Clicks the Season Pass Holder option once the date
         is selected, which redirect to purchasing
         """
-        # Find button
+        # Wait for button to load and click
+        btn_xpath = '//div[text()="Season\'s Pass"]/parent::*/parent::*'
+        WebDriverWait(self.driver, 3).until(EC.presence_of_element_located(
+            (By.XPATH, btn_xpath)))
         btn = self.driver.find_element(
-            By.XPATH, '//div[text()="Season\'s Pass"]/parent::*/parent::*')
+            By.XPATH, btn_xpath)
         btn.click()
 
         # Wait for honk to load
@@ -178,6 +188,8 @@ class BrightonParking:
         confirm_btn = self.driver.find_element(
             By.XPATH, '//button[text()="Confirm"]')
         confirm_btn.click()
+        # Give some time for the reservation to complete
+        time.sleep(3)
         print("Reservation complete")
 
     def output(self):
@@ -200,12 +212,15 @@ if __name__ == "__main__":
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1280x1696")
     chrome = webdriver.Chrome(options=options)
-    sp = BrightonParking(chrome)
+    sp = BrightonParking(chrome, credentials={
+        "username": os.getenv("USERNAME"),
+        "password": os.getenv("PASSWORD")
+    })
     sp.start_session()
     sp.login()
     sp.activate_code()
     sp.go_to_selection_calendar()
-    sp.navigate_to_date(dt.datetime(2024, 1, 11))
+    sp.navigate_to_date(dt.datetime(2024, 1, 9))
     sp.select_parking_option()
     # sp.reserve()
     # Set a breakpoint here to keep page open
