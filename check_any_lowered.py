@@ -30,13 +30,6 @@ options.add_argument("--window-size=1280x1696")
 chrome = webdriver.Chrome(options=options)
 
 
-def getAvailabilities(apiClient: HonkApiClient, startDate: datetime.date, endDate: datetime.date) -> list[DateAvailability]:
-    global previousAvailabilities
-
-    currentAvailabilities = apiClient.getAvailability(startDate, endDate)
-    return currentAvailabilities
-
-
 def printNewOpenings(previousAvailabilities: list[DateAvailability], currentAvailabilities: list[DateAvailability], resortName: str):
     # Check to see if there are any dates with more available spots than before.
 
@@ -76,8 +69,8 @@ def checkBrighton():
     global brightonPrev
 
     client = HonkApiResortClients.BRIGHTON.value
-    currentAvailabilities = getAvailabilities(
-        client, datetime.date(2023, 12, 7), datetime.date(2024, 4, 10))
+    currentAvailabilities = client.getAvailability(
+        datetime.date(2023, 12, 7), datetime.date(2024, 4, 10))
     printNewOpenings(brightonPrev, currentAvailabilities, "Brighton")
     brightonPrev = currentAvailabilities
 
@@ -89,7 +82,7 @@ def checkSolitude():
     global solitudePrev
 
     client = HonkApiResortClients.SOLITUDE.value
-    currentAvailabilities = getAvailabilities(
+    currentAvailabilities = client.getAvailability(
         client, datetime.date(2023, 12, 7), datetime.date(2024, 4, 10))
     printNewOpenings(solitudePrev, currentAvailabilities, "Solitude")
     solitudePrev = currentAvailabilities
