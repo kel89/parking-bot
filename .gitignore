@@ -6,4 +6,4 @@ env/
 __pycache__/
 
 # polling config
-polling_config.json
+pollingConfig*.json

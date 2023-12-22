@@ -1,4 +1,7 @@
-# one off script to check if parking availability has changed for any dates
+# script to log updates in parking availability
+#
+# for printing to console and writing to a file:
+# python3 -u check_any_lowered.py 2>&1 | tee updates.log
 
 import datetime
 import os
@@ -83,7 +86,7 @@ def checkSolitude():
 
     client = HonkApiResortClients.SOLITUDE.value
     currentAvailabilities = client.getAvailability(
-        client, datetime.date(2023, 12, 7), datetime.date(2024, 4, 10))
+        datetime.date(2023, 12, 7), datetime.date(2024, 4, 10))
     printNewOpenings(solitudePrev, currentAvailabilities, "Solitude")
     solitudePrev = currentAvailabilities
 

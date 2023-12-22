@@ -29,13 +29,7 @@ from BrightonParking import BrightonParking
 import schedule
 import time
 
-
-options = webdriver.ChromeOptions()
-options.add_argument("--headless=new")
-options.add_argument('--no-sandbox')
-options.add_argument("--disable-gpu")
-options.add_argument("--window-size=1280x1696")
-chrome = webdriver.Chrome(options=options)
+import traceback
 
 
 # Only set this to true at the beginning and if we try to make a reservation to
@@ -45,6 +39,12 @@ shouldUpdateCurrentReservations = True
 # Keep track of the reservations the account currently has; used to
 # avoid attempting to reserve a date that we already have reserved
 reservedDates = []
+
+options = webdriver.ChromeOptions()
+options.add_argument("--headless=new")
+options.add_argument('--no-sandbox')
+options.add_argument("--disable-gpu")
+options.add_argument("--window-size=1280x1696")
 
 
 def checkForReservations():
@@ -68,15 +68,19 @@ def checkForReservations():
         print(".", end="", flush=True)
         return
 
+    # We're attempting to make reservations
+    shouldUpdateCurrentReservations = True
     for date in availableDates:
+        webdriver = createWebDriver()
         print("Attempting to reserve date: " + str(date))
         try:
-            shouldUpdateCurrentReservations = True
-            webDriver.make_reservation(datetime.datetime(
+            webdriver.make_reservation(datetime.datetime(
                 date.year, date.month, date.day))
         except Exception as e:
             print("Failed to reserve date: " + str(date))
-            print(e)
+            traceback.print_exc()
+        finally:
+            webdriver.driver.quit()
 
 
 if __name__ == "__main__":
@@ -95,14 +99,21 @@ if __name__ == "__main__":
             "password": config["password"]
         }
 
+        # Define a function to create a webdriver, so that we can create a new one
+        # for each attempt at reserving.
         if config["resort"] == "brighton":
             apiClient = HonkApiResortClients.BRIGHTON.value
-            webDriver = BrightonParking(
-                driver=chrome, credentials=creds)
+
+            def createWebDriver():
+                chrome = webdriver.Chrome(options=options)
+                return BrightonParking(chrome, credentials=creds)
         elif config["resort"] == "solitude":
             apiClient = HonkApiResortClients.SOLITUDE.value
-            webDriver = SolitudeParking(
-                driver=chrome, credentials=creds)
+
+            def createWebDriver():
+                chrome = webdriver.Chrome(options=options)
+                return SolitudeParking(chrome, credentials=creds)
+
         else:
             raise Exception(
                 "Invalid resort specified in config, must be 'brighton' or 'solitude'")
