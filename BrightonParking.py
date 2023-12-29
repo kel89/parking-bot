@@ -153,10 +153,15 @@ class BrightonParking:
         # page (to support the animation of switching months), so some dates
         # are duplicated. We find the first one that is enabled and click it.
         btns = self.driver.find_elements(
-            By.XPATH, '//div[@aria-label="{}"]'.format(date_string))
+            By.XPATH, '//div[@aria-label="{}"]'.format(date_string)) + self.driver.find_elements(
+            By.XPATH, '//div[@aria-label="Today, {}"]'.format(date_string))
+
+        if len(btns) == 0:
+            raise Exception(
+                "Can't find date button for {}".format(date_string))
 
         for btn in btns:
-            if btn.is_enabled() and btn.is_displayed() and btn.location['x'] > 0 and btn.location['y'] > 0:
+            if btn.is_enabled() and btn.is_displayed() and btn.location['x'] > 0 and btn.location['x'] < 1696 and btn.location['y'] > 0:
                 btn.click()
                 break
 
@@ -229,9 +234,14 @@ class BrightonParking:
         self.go_to_selection_calendar()
         self.navigate_to_date(target_date)
 
+        # Refresh date is day after target date, unless target date is the last
+        # day of the month, in which case we refresh to the previous day.
         refresh_date = target_date + dt.timedelta(days=1)
-        has_availability = False
+        if refresh_date.month != target_date.month:
+            refresh_date = target_date - dt.timedelta(days=1)
 
+        # Keep trying to select the parking option until it is available
+        has_availability = False
         while not has_availability:
             try:
                 self.select_parking_option(reservation_type)
@@ -240,6 +250,7 @@ class BrightonParking:
                 # Option is still sold out, navigate to next/previous day and try again
                 time.sleep(5)
                 self.navigate_to_date(refresh_date)
+
                 time.sleep(1)
                 self.navigate_to_date(target_date)
 
@@ -249,7 +260,7 @@ class BrightonParking:
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--config")
+    parser.add_argument("--config", default="pollingConfig.json")
     args = parser.parse_args()
 
     config = load_json_config(args.config)
