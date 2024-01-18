@@ -161,7 +161,7 @@ class WebdriverPoller:
                 "Can't find date button for {}".format(date_string))
 
         for btn in btns:
-            if btn.is_enabled() and btn.is_displayed() and btn.location['x'] > 0 and btn.location['x'] < 1696 and btn.location['y'] > 0:
+            if btn.is_enabled() and btn.is_displayed() and btn.location['x'] > 0 and btn.location['y'] > 0:
                 btn.click()
                 break
 
