@@ -1,12 +1,21 @@
+"""
+Example config file:
+{
+    "resort": "solitude",
+    "username": "johndeervalley@gmail.com",
+    "password": "snowboarderssuck",
+    "dates": [
+        "2024-01-05",
+    ],
+    "reservation_type": "passholder"
+}
+"""
+
 import dataclasses
 import datetime
 from enum import Enum
 import json
-
-
-class Resort(Enum):
-    BRIGHTON = "brighton"
-    SOLITUDE = "solitude"
+from resorts import Resort, Resorts
 
 
 class ReservationType(Enum):
@@ -28,10 +37,20 @@ def load_json_config(path: str) -> ParkingConfig:
         config = json.load(f)
 
     try:
+        if config["resort"] == "brighton":
+            resort = Resorts.BRIGHTON
+
+        elif config["resort"] == "solitude":
+            resort = Resorts.SOLITUDE
+
+        else:
+            raise Exception(
+                "Invalid resort specified in config, must be 'brighton' or 'solitude'")
+
         return ParkingConfig(
             username=config["username"],
             password=config["password"],
-            resort=Resort(config["resort"]),
+            resort=resort,
             reservation_type=ReservationType(config["reservation_type"]),
             dates=[datetime.datetime.strptime(
                 date, "%Y-%m-%d").date() for date in config["dates"]
