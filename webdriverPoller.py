@@ -16,11 +16,13 @@ from tempfile import mkdtemp
 import time
 import datetime as dt
 
+from SMSHelper import SMSHelper
+
 from pollingConfig import ReservationType, load_json_config
 
 
 class WebdriverPoller:
-    def __init__(self, driver, credentials, resort):
+    def __init__(self, driver, credentials, resort, sms_helper=None):
         self.driver = driver
         self.username = credentials['username']
         self.password = credentials['password']
@@ -28,6 +30,7 @@ class WebdriverPoller:
         self.login_url = resort.value.base_url + "/login"
         self.parking_codes_url = resort.value.base_url + "/parking-codes"
         self.calendar_url = resort.value.base_url + "/select-parking"
+        self.sms_helper = sms_helper
 
     def start_session(self):
         """Creates the selenium session
@@ -248,6 +251,8 @@ class WebdriverPoller:
                 has_availability = True
             except Exception as e:
                 # Option is still sold out, navigate to next/previous day and try again
+                print("Failed attempt at", dt.datetime.now().strftime(
+                    "%Y-%m-%d %H:%M:%S"))
                 time.sleep(5)
                 self.navigate_to_date(refresh_date)
 
@@ -255,7 +260,11 @@ class WebdriverPoller:
                 self.navigate_to_date(target_date)
 
         self.reserve(reservation_type)
-        print("Reservation secured")
+        print("Reservation secured at ",
+              dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        if self.sms_helper:
+            s = "Parking reservation at " + self.resort.name + " for " + target_date.strftime("%Y-%m-%d") + " has been secured!"
+            self.sms_helper.send_message(s)
 
 
 if __name__ == "__main__":
@@ -273,11 +282,19 @@ if __name__ == "__main__":
     options.add_argument("--window-size=1280x1696")
     chrome = webdriver.Chrome(options=options)
 
+    # Check for sms options
+    # if config has smsEmail and smsPassword, then we will use the sms helper
+    if SMSHelper.is_valid_config(config):
+        sms_helper = SMSHelper(config)
+    else:
+        sms_helper = None
+
     sp = WebdriverPoller(chrome, credentials={
         "username": config.username,
         "password": config.password
     },
-        resort=config.resort
+        resort=config.resort,
+        sms_helper=sms_helper
     )
     sp.start_session()
     target = config.dates[0]

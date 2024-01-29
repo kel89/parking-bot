@@ -21,3 +21,18 @@ This will open a browser, navigate to the target date, and reserve; if the date 
 # Adding resorts
 
 Add an enum class in [resorts.py](resorts.py) and update [pollingConfig.py](pollingConfig.py) to read a config file with that resort
+
+# SMS Config
+Using a free hack sending from a gmail account. Need to configure an "application password" to use
+instructions can be found [here](https://support.google.com/accounts/answer/185833?p=InvalidSecondFactor&visit_id=637700239874464736-1954441174&rd=1)
+
+Include the following in the config json:
+```
+{
+    ...
+    "alertNumber": "1234567890",
+    "alertCarrier": "verizon", // see sms file for available carriers
+    "smsEmail": "youemail@gmail.com",
+    "smsEmailPassword": "yourApplicationPassword"
+}
+```
