@@ -30,6 +30,10 @@ class ParkingConfig:
     resort: Resort
     dates: list[datetime.date]
     reservation_type: ReservationType
+    alertNumber: str
+    alertCarrier: str
+    smsEmail: str
+    smsEmailPassword: str
 
 
 def load_json_config(path: str) -> ParkingConfig:
@@ -54,7 +58,11 @@ def load_json_config(path: str) -> ParkingConfig:
             reservation_type=ReservationType(config["reservation_type"]),
             dates=[datetime.datetime.strptime(
                 date, "%Y-%m-%d").date() for date in config["dates"]
-            ]
+            ],
+            alertNumber=config["alertNumber"] if "alertNumber" in config else None,
+            alertCarrier=config["alertCarrier"] if "alertCarrier" in config else None,
+            smsEmail=config["smsEmail"] if "smsEmail" in config else None,
+            smsEmailPassword=config["smsEmailPassword"] if "smsEmailPassword" in config else None
         )
 
     except Exception as e:

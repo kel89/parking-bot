@@ -6,6 +6,7 @@ import dataclasses
 
 @dataclasses.dataclass
 class Resort:
+    name: str
     base_url: str
     main_screen_string: str
     passholder_string: str
@@ -14,6 +15,7 @@ class Resort:
 
 class Resorts(Enum):
     BRIGHTON = Resort(
+        name="Solitude",
         base_url="https://reservenski.parkbrightonresort.com",
         main_screen_string="Reserve Parking Before Arriving at Brighton",
         passholder_string="Season\'s Pass",
@@ -21,6 +23,7 @@ class Resorts(Enum):
     )
 
     SOLITUDE = Resort(
+        name="Brighton", 
         base_url="https://reservenski.parksolitude.com",
         main_screen_string="Reserve Parking Before Arriving at Solitude",
         passholder_string="Season Pass Holders",
