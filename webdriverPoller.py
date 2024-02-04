@@ -19,6 +19,7 @@ import datetime as dt
 from SMSHelper import SMSHelper
 
 from pollingConfig import ReservationType, load_json_config
+from resorts import Resorts
 
 
 class WebdriverPoller:
@@ -177,6 +178,10 @@ class WebdriverPoller:
             btn_xpath = f'//div[text()="{self.resort.passholder_string}"]/parent::*/following-sibling::div[text()="$0"]/parent::*'
         elif (reservation_type == ReservationType.CARPOOL):
             btn_xpath = f'//div[text()="{self.resort.carpool_string}"]/parent::*/following-sibling::div[text()="$0"]/parent::*'
+        elif (reservation_type == ReservationType.CREDITCARD):
+            btn_xpath = f'//div[contains(text(), "{self.resort.creditcard_string}")]/parent::*/parent::*'
+            # usinbg contains because sometimes have text like (only 2 remainig)
+            # may want to consider using this structure for the other xpaths
 
         WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(
             (By.XPATH, btn_xpath)))
@@ -195,6 +200,14 @@ class WebdriverPoller:
             btn_xpath = '//div[text()="Redeem A Pass"]/parent::*/parent::*'
         elif (reservation_type == ReservationType.CARPOOL):
             btn_xpath = '//div[text()="Park For Free"]/parent::*/parent::*'
+        elif (reservation_type == ReservationType.CREDITCARD):
+            if (self.resort == Resorts.BRIGHTON.value):
+                btn_xpath = '//div[text()="Pay $20.00 and Park"]/parent::*/parent::*'
+                
+            elif (self.resort == Resorts.SOLITUDE.value):
+                btn_xpath = '//div[text()="Pay $35.00 and Park"]/parent::*/parent::*'
+                # TODO: verify that this is the correct soli checkout text
+                # I cannot becuase I don't see that option with my pass
 
         # Ensure that the button is there
         WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(

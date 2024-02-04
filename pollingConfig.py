@@ -21,6 +21,7 @@ from resorts import Resort, Resorts
 class ReservationType(Enum):
     PASSHOLDER = "passholder"
     CARPOOL = "carpool"
+    CREDITCARD = "creditcard"
 
 
 @dataclasses.dataclass
