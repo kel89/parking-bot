@@ -201,13 +201,14 @@ class WebdriverPoller:
         elif (reservation_type == ReservationType.CARPOOL):
             btn_xpath = '//div[text()="Park For Free"]/parent::*/parent::*'
         elif (reservation_type == ReservationType.CREDITCARD):
-            if (self.resort == Resorts.BRIGHTON.value):
-                btn_xpath = '//div[text()="Pay $20.00 and Park"]/parent::*/parent::*'
+            btn_xpath = f'//div[text()="{self.resort.creditcard_honk_payment_button_string}"]/parent::*/parent::*'
+            # if (self.resort == Resorts.BRIGHTON.value):
+            #     btn_xpath = '//div[text()="Pay $20.00 and Park"]/parent::*/parent::*'
                 
-            elif (self.resort == Resorts.SOLITUDE.value):
-                btn_xpath = '//div[text()="Pay $35.00 and Park"]/parent::*/parent::*'
-                # TODO: verify that this is the correct soli checkout text
-                # I cannot becuase I don't see that option with my pass
+            # elif (self.resort == Resorts.SOLITUDE.value):
+            #     btn_xpath = '//div[text()="Pay $35.00 and Park"]/parent::*/parent::*'
+            #     # TODO: verify that this is the correct soli checkout text
+            #     # I cannot becuase I don't see that option with my pass
 
         # Ensure that the button is there
         WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
