@@ -17,15 +17,15 @@ class Resorts(Enum):
     BRIGHTON = Resort(
         name="Brighton",
         base_url="https://reservenski.parkbrightonresort.com",
-        main_screen_string="Reserve Parking Before Arriving at Brighton",
+        main_screen_string="Reserve Parking Before Arriving",
         passholder_string="Season\'s Pass",
         carpool_string="3+ Carpool"
     )
 
     SOLITUDE = Resort(
-        name="Solitude", 
+        name="Solitude",
         base_url="https://reservenski.parksolitude.com",
-        main_screen_string="Reserve Parking Before Arriving at Solitude",
+        main_screen_string="Reserve Parking Before Arriving",
         passholder_string="Season Pass Holders",
         carpool_string="Carpool 4+ occupancy or ADA "
     )
