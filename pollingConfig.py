@@ -21,6 +21,7 @@ from resorts import Resort, Resorts
 class ReservationType(Enum):
     PASSHOLDER = "passholder"
     CARPOOL = "carpool"
+    CREDITCARD = "creditcard"
 
 
 @dataclasses.dataclass
@@ -47,9 +48,12 @@ def load_json_config(path: str) -> ParkingConfig:
         elif config["resort"] == "solitude":
             resort = Resorts.SOLITUDE
 
+        elif config["resort"] == "alta":
+            resort = Resorts.ALTA
+
         else:
             raise Exception(
-                "Invalid resort specified in config, must be 'brighton' or 'solitude'")
+                "Invalid resort specified in config, must be 'brighton' or 'solitude', or 'alta'")
 
         return ParkingConfig(
             username=config["username"],
