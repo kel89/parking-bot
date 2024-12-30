@@ -49,7 +49,7 @@ class WebdriverPoller:
         self.driver.get(self.login_url)
 
         # Get elements
-        WebDriverWait(self.driver, 5).until(EC.presence_of_all_elements_located(
+        WebDriverWait(self.driver, 15).until(EC.presence_of_all_elements_located(
             (By.ID,
              'emailAddress')
         ))
@@ -68,7 +68,7 @@ class WebdriverPoller:
         submit_btn.click()
 
         # Wait until finished and re-directed
-        WebDriverWait(self.driver, 5).until(EC.presence_of_all_elements_located(
+        WebDriverWait(self.driver, 15).until(EC.presence_of_all_elements_located(
             (By.XPATH,
              f'//div[text()="{self.resort.main_screen_string}"]')
         ))
@@ -82,7 +82,7 @@ class WebdriverPoller:
 
         # Wait for button
         btn_xpath = '//button[text()="Reserve Parking"]'
-        WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
+        WebDriverWait(self.driver, 15).until(EC.presence_of_element_located(
             (By.XPATH, btn_xpath)))
 
         # Select Code
@@ -92,8 +92,8 @@ class WebdriverPoller:
 
         # This will automatically navigate to calendar, just don't let
         # go until this is complete
-        WebDriverWait(self.driver, 5).until(EC.presence_of_all_elements_located(
-            (By.XPATH, '//div[text()="What Day Are You Parking at "]')
+        WebDriverWait(self.driver, 15).until(EC.presence_of_all_elements_located(
+            (By.XPATH, '//div[text()="Reserve a parking spot"]')
         ))
 
     def go_to_selection_calendar(self):
@@ -110,8 +110,8 @@ class WebdriverPoller:
             date (datetime): date we want to be able to select
         """
         # Wait for calendar to load
-        WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
-            (By.CLASS_NAME, 'ParkingSelection_calendarWrapper__kS9AJ')))
+        WebDriverWait(self.driver, 15).until(EC.presence_of_element_located(
+            (By.CLASS_NAME, 'mbsc-calendar-month')))
 
         # Navigate to appropriate month
         self._go_to_month(date)
@@ -135,7 +135,7 @@ class WebdriverPoller:
         while current_month != target_month:
             # Click next button
             btn = self.driver.find_element(
-                By.XPATH, '//*[@id="root"]/div/div/div/div[2]/div/div/div/div[1]/div/button[3]')
+                By.XPATH, '//button[contains(@aria-label, "Next page")]')
             btn.click()
 
             # Wait until month is showing
@@ -151,7 +151,7 @@ class WebdriverPoller:
             date (datetime): date we want to select
         """
         # Get the matching string
-        date_string = f'{date:%A}, {date:%B} {date.day}'
+        date_string = f'{date:%A}, {date:%B} {date.day}, {date.year}'
 
         # Find the date button. There are hidden calendar elements on the
         # page (to support the animation of switching months), so some dates
@@ -175,9 +175,9 @@ class WebdriverPoller:
         """
         # Wait for button to load and click
         if (reservation_type == ReservationType.PASSHOLDER):
-            btn_xpath = f'//div[text()="{self.resort.passholder_string}"]/parent::*/following-sibling::div[text()="$0"]/parent::*'
+            btn_xpath = f'//div[text()="{self.resort.passholder_string}"]/parent::*/following-sibling::div/div[text()="$0"]/parent::*'
         elif (reservation_type == ReservationType.CARPOOL):
-            btn_xpath = f'//div[text()="{self.resort.carpool_string}"]/parent::*/following-sibling::div[text()="$0"]/parent::*'
+            btn_xpath = f'//div[text()="{self.resort.carpool_string}"]/parent::*/following-sibling::div/div[text()="$0"]/parent::*'
         elif (reservation_type == ReservationType.CREDITCARD):
             btn_xpath = f'//div[contains(text(), "{self.resort.creditcard_string}")]/parent::*/parent::*'
             # usinbg contains because sometimes have text like (only 2 remainig)
@@ -190,7 +190,7 @@ class WebdriverPoller:
         btn.click()
 
         # Wait for honk to load
-        WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
+        WebDriverWait(self.driver, 15).until(EC.presence_of_element_located(
             (By.XPATH, '//div[text()="Checkout"]')))
 
     def reserve(self, reservation_type: ReservationType):
@@ -204,14 +204,14 @@ class WebdriverPoller:
             btn_xpath = f'//div[text()="{self.resort.creditcard_honk_payment_button_string}"]/parent::*/parent::*'
             # if (self.resort == Resorts.BRIGHTON.value):
             #     btn_xpath = '//div[text()="Pay $20.00 and Park"]/parent::*/parent::*'
-                
+
             # elif (self.resort == Resorts.SOLITUDE.value):
             #     btn_xpath = '//div[text()="Pay $35.00 and Park"]/parent::*/parent::*'
             #     # TODO: verify that this is the correct soli checkout text
             #     # I cannot becuase I don't see that option with my pass
 
         # Ensure that the button is there
-        WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
+        WebDriverWait(self.driver, 15).until(EC.presence_of_element_located(
             (By.XPATH, btn_xpath)))
 
         # Get Button
@@ -220,7 +220,7 @@ class WebdriverPoller:
         btn.click()
 
         # Wait for Confirm button
-        WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
+        WebDriverWait(self.driver, 15).until(EC.presence_of_element_located(
             (By.XPATH, '//button[text()="Confirm"]')))
 
         # Click confirm button
@@ -240,7 +240,7 @@ class WebdriverPoller:
         self.go_to_selection_calendar()
         self.navigate_to_date(target_date)
         self.select_parking_option()
-        self.reserve()
+        # self.reserve()
 
     def poll_for_reservation(self, target_date, reservation_type: ReservationType):
         """Polls for a reservation for the given date"""
@@ -262,22 +262,25 @@ class WebdriverPoller:
         while not has_availability:
             try:
                 self.select_parking_option(reservation_type)
+                self.reserve(reservation_type)
+                print("Reservation secured at ",
+                      dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                 has_availability = True
             except Exception as e:
                 # Option is still sold out, navigate to next/previous day and try again
                 print("Failed attempt at", dt.datetime.now().strftime(
                     "%Y-%m-%d %H:%M:%S"))
                 time.sleep(5)
-                self.navigate_to_date(refresh_date)
+                self.driver.find_element(
+                    By.XPATH, '//button[text()="Next Day >"]').click()
 
                 time.sleep(1)
-                self.navigate_to_date(target_date)
+                self.driver.find_element(
+                    By.XPATH, '//button[text()="< Previous Day"]').click()
 
-        self.reserve(reservation_type)
-        print("Reservation secured at ",
-              dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         if self.sms_helper:
-            s = "Parking reservation at " + self.resort.name + " for " + target_date.strftime("%Y-%m-%d") + " has been secured!"
+            s = "Parking reservation at " + self.resort.name + " for " + \
+                target_date.strftime("%Y-%m-%d") + " has been secured!"
             self.sms_helper.send_message(s)
 
 
